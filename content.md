@@ -138,7 +138,7 @@ With everything in place, you're now ready to test the email functionality.
 This process integrates email notifications seamlessly into your application workflow, enhancing the user experience by keeping them informed about new tasks. Remember, while testing in development with Letter Opener is straightforward, you'll need to configure your production environment to use a real email service provider for sending emails to actual users.
 
 ## Sending Real Emails in Production
-For sending real emails in a production environment, you'll need a [domain name](https://learn.firstdraft.com/lessons/313-rails-domain-names) and an SMTP service. Consider services like [Postmark](https://postmarkapp.com/), [Sendgrid](https://sendgrid.com/), [Mailgun](https://mailgun.com/), or [Amazon Simple Email Service](https://aws.amazon.com/ses/). Each service offers different features and pricing, so choose one that best fits your needs.
+For sending real emails in a production environment, you'll need a [domain name](https://learn.firstdraft.com/lessons/313-rails-domain-names) and an SMTP service. Consider services like [Postmark](https://postmarkapp.com/), [Mailtrap](https://mailtrap.io/), [Sendgrid](https://sendgrid.com/), [Mailgun](https://mailgun.com/), or [Amazon Simple Email Service](https://aws.amazon.com/ses/). Each service offers different features and pricing, so choose one that best fits your needs.
 
 ## Deep Dive into ActionMailer and ActionMailbox
 [ActionMailer](https://guides.rubyonrails.org/action_mailer_basics.html) and [ActionMailbox](https://guides.rubyonrails.org/action_mailbox_basics.html) are powerful tools in Rails that handle outbound and inbound emails, respectively.
