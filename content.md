@@ -166,48 +166,53 @@ Internet and email service providers monitor and evaluate the behavior of emails
 Sender reputation is essentially the trustworthiness of your email sending practices in the eyes of internet and email service providers. Maintaining a good sender reputation is crucial for ensuring your emails reach your audience effectively. Here are some factors that affect sender reputation:
 
 - **Volume of Emails**: A sudden spike in email volume can trigger red flags for internet service providers, as it's often indicative of spamming activity.
-
 - **Bounce Rates**: A high rate of email bounces, especially hard bounces (permanent delivery failures), negatively impacts your reputation. It suggests poor list hygiene or outdated email lists.
-
 - **Spam Complaints**: If recipients frequently mark your emails as spam, it severely damages your reputation. Keeping spam complaints low is crucial for maintaining a good standing.
-
 - **Engagement Rates**: Internet service providers also look at positive engagement metrics, such as open rates, reply rates, and forwarding rates. High engagement can improve your sender reputation.
-
 - **Spam Trap Hits**: Sending emails to spam trap addresses (email addresses created specifically to catch spammers) can significantly harm your reputation. It indicates that you're either purchasing email lists or not maintaining list hygiene.
-
 - **Authentication Records**: Implementing email authentication protocols like SPF, DKIM, and DMARC helps build trust with internet service providers and can positively influence your sender reputation.
-
 - **Content Quality**: The relevance and quality of your email content play a role. Content that triggers spam filters or is consistently low-quality can hurt your reputation.
 
 ### Managing and Improving Sender Reputation
 
 - **Monitor Your Metrics**: Keep an eye on delivery rates, bounce rates, spam complaints, and engagement metrics. Many email marketing platforms provide these analytics.
-
 - **Maintain List Hygiene**: Regularly clean your email list to remove inactive or invalid addresses and manage hard bounces effectively.
-
 - **Follow Best Practices**: Ensure your emails provide value, seek permission before sending (opt-in), and make it easy for recipients to unsubscribe.
-
 - **Warm Up Your IP**: If you're using a new IP address for sending emails, gradually increase your sending volume to build a positive reputation over time.
-
 - **Use Email Authentication**: Implement SPF, DKIM, and DMARC to authenticate your emails and protect against spoofing and phishing.
 
 ### Security (SPF, DKIM, and DMARC)
 
-SPF, DKIM, and DMARC are email authentication methods that help protect your domain from being used for email spoofing, phishing attacks, and other forms of abuse. Implementing these standards is crucial for ensuring your emails are delivered reliably and for maintaining your domain's reputation. Let's delve into each of these methods:
+When you use an email sending API like SendGrid or Mailtrap, their servers are sending email on behalf of your domain (e.g. @yourdomain.com). Without DNS records, inbox providers (Gmail, Outlook, etc.) can't tell:
 
-#### SPF (Sender Policy Framework)
+- Did you really authorize this service?
+- Or is this just someone spoofing your domain?
 
-SPF is an email authentication method that allows domain owners to specify which mail servers are authorized to send emails on behalf of their domain. When an email is received, the receiving mail server checks the DNS records of the sender's domain for an SPF record. This record lists the authorized sending IP addresses. If the email's source IP matches one in the SPF record, it's considered a legitimate email. Otherwise, it may be marked as spam or rejected. SPF helps to prevent email spoofing by ensuring that only authorized servers can send emails from your domain. It reduces the chance of your domain being blacklisted due to spam or phishing activities conducted by unauthorized senders.
+DNS is the public, cryptographically-verifiable place where you answer that question.
+
+Think of DNS as your domain's public notarized statement:
+
+> "Yes, I authorize these servers to send email as me."
+
+Mailbox providers like GMail check DNS before they trust the email.
+
+SPF, DKIM, and DMARC are email authentication methods that help protect your domain from being used for email spoofing, phishing attacks, and other forms of abuse.
+
+#### SPF - *Who* is allowed to send
+
+SPF (Sender Policy Framework) is an email authentication method that allows domain owners to specify which mail servers are authorized to send emails on behalf of their domain. When an email is received, the receiving mail server checks the DNS records of the sender's domain for an SPF record. 
 
 Example SPF record
 
 |Type|Host|Value|
 |----|----|-----|
-|TXT Record|@|v=spf1 include:_spf.google.com ~all|
+| TXT| yourdomain.com | v=spf1 include:sendgrid.net -all |
 
-#### DKIM (DomainKeys Identified Mail)
+This example record basically says "SendGrid’s servers are allowed to send email for my domain." Without SPF, anyone could claim to be @yourdomain.com.
 
-DKIM provides a way to validate a domain name identity that is associated with a message through cryptographic authentication. DKIM uses a pair of cryptographic keys, one private and one public. The sending server attaches a digital signature to the email headers using the private key. The receiving server then retrieves the public key from the sender's DNS records and uses it to verify the signature. If the signature is valid, it confirms the email was not tampered with in transit and that it indeed comes from the specified domain. DKIM ensures the integrity and authenticity of an email, significantly reducing the risk of email being altered or forged. It helps improve email deliverability and protects the domain's reputation.
+#### DKIM - This message wasn't *altered*
+
+DKIM (DomainKeys Identified Mail) provides a way to validate a domain name identity that is associated with a message through cryptographic authentication. DKIM uses a pair of cryptographic keys, one private and one public. The sending server attaches a digital signature to the email headers using the private key. The receiving server then retrieves the public key from the sender's DNS records and uses it to verify the signature. If the signature is valid, it confirms the email was not tampered with in transit and that it indeed comes from the specified domain. DKIM ensures the integrity and authenticity of an email, significantly reducing the risk of email being altered or forged. It helps improve email deliverability and protects the domain's reputation.
 
 Example DKIM record
 
@@ -215,15 +220,25 @@ Example DKIM record
 |----|----|-----|
 |TXT Record|selector._domainkey.yourdomain.com|k=rsa; p=MIGfMA...|
 
-#### DMARC (Domain-based Message Authentication, Reporting, and Conformance)
+1. SendGrid signs the email with a private key
+2. Inbox providers fetch the public key from DNS
+3. They verify the signature
 
-DMARC builds upon SPF and DKIM. It allows domain owners to specify how an email should be handled if it fails SPF or DKIM checks. Additionally, it provides a way for email receivers to report back to the sender about messages that pass or fail DMARC evaluation. Domain owners publish a DMARC policy in their DNS records, indicating their preferences for email handling (e.g., reject, quarantine, or allow) and reporting. When receiving an email, the mail server checks it against the DMARC policy. Based on the results and the policy's instructions, it decides whether to deliver, quarantine, or reject the email. DMARC allows domain owners to protect their domain from unauthorized use, reduce the risk of phishing attacks, and increase the deliverability of legitimate emails. It also provides visibility into email flow, enabling domain owners to identify and address authentication issues and abuse.
+This proves the email was authorized by you and wasn’t modified in transit.
+
+#### DMARC - What to do if something looks fake
+
+DMARC (Domain-based Message Authentication, Reporting, and Conformance) allows domain owners to specify how an email should be handled if it fails SPF or DKIM checks. Additionally, it provides a way for email receivers to report back to the sender about messages that pass or fail DMARC evaluation. Domain owners publish a DMARC policy in their DNS records, indicating their preferences for email handling (e.g., reject, quarantine, or allow) and reporting. Essentially this record specifies, if SPF/DKIM fail, here's how strict you should be.
 
 Example DMARC record
 
 |Type|Host|Value|
 |----|----|-----|
 |TXT Record|_dmarc|v=DMARC1; p=quarantine; pct=100; rua=mailto:dmarc-reports@yourdomain.com;|
+
+<aside class="tip">
+  Note: these example DNS records for SPF, DKIM, and DMARC are purely for demonstration purposes. When you sign up for an email service they will provide these records for you to add to your DNS configuration.
+</aside>
 
 ## Managing Subscriptions and Unsubscribes
 
