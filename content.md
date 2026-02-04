@@ -1,5 +1,10 @@
 # Email in Rails Applications 📬
+
 In this lesson, we'll explore how to incorporate email functionality into your Rails applications. This includes sending emails, simulating email sending in development, and understanding the basics of email protocols. We'll also touch on email customization, including views and controllers, and provide tips on avoiding spam filters. Let's dive in!
+
+<div class="alert alert-info">
+  <a href="https://youtu.be/06J0jaRcaHU" target="_blank">Video</a>
+</div>
 
 ## Getting Started
 Before we proceed, ensure you have a Rails environment ready for hands-on practice. If not, create a new blank Rails application and follow the steps outlined below to set up user authentication with Devise, a Task model, and email simulation with [Letter Opener](https://github.com/ryanb/letter_opener).
